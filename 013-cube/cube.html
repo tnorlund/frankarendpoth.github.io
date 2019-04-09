@@ -150,15 +150,28 @@
 
         // if arrow down
         // context.beginPath();
-        // context.moveTo(width/2, height/2 + symbol_width);
-        // context.lineTo(width/2 + symbol_width, height/2);
+        // context.moveTo(width/2,                  height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width,   height/2);
         // context.lineTo(width/2 + symbol_width/2, height/2);
         // context.lineTo(width/2 + symbol_width/2, height/2 - symbol_width);
         // context.lineTo(width/2 - symbol_width/2, height/2 - symbol_width);
         // context.lineTo(width/2 - symbol_width/2, height/2);
-        // context.lineTo(width/2 - symbol_width, height/2);
+        // context.lineTo(width/2 - symbol_width,   height/2);
         // context.closePath();
-        // context.fill()
+        // context.fill();
+
+        // if arrow right-down
+        symbol_width *= 0.866
+        context.beginPath();
+        context.moveTo(width/2 + symbol_width,       height/2 + symbol_width);
+        context.lineTo(width/2 + symbol_width,       height/2 - symbol_width*(3/4));
+        context.lineTo(width/2 + symbol_width/2,     height/2 - symbol_width*(1/4));
+        context.lineTo(width/2 - symbol_width*(1/4), height/2 - symbol_width);
+        context.lineTo(width/2 - symbol_width,       height/2 - symbol_width*(1/4));
+        context.lineTo(width/2 - symbol_width*(1/4), height/2 + symbol_width/2);
+        context.lineTo(width/2 - symbol_width*(3/4), height/2 + symbol_width);
+        context.closePath();
+        context.fill();
 
         for (let index = cube.faces.length - 1; index > -1; -- index) {
 
