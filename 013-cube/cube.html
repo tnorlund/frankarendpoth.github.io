@@ -138,13 +138,27 @@
         cube.rotateY(-pointer.x * 0.0001);
 
         context.fillStyle = "#000000";
-
+        var symbol_width = 15;
         var vertices = project(cube.vertices, width, height);
-        context.beginPath();
-        context.arc(
-        	width/2, 
-        	height/2, 25, 0, 2 * Math.PI);
-        context.fill()
+
+        // if dont care
+        // context.beginPath();
+        // context.arc(
+        // 	width/2, 
+        // 	height/2, symbol_width*0.7, 0, 2 * Math.PI);
+        // context.fill()
+
+        // if arrow down
+        // context.beginPath();
+        // context.moveTo(width/2, height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width, height/2);
+        // context.lineTo(width/2 + symbol_width/2, height/2);
+        // context.lineTo(width/2 + symbol_width/2, height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width/2, height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width/2, height/2);
+        // context.lineTo(width/2 - symbol_width, height/2);
+        // context.closePath();
+        // context.fill()
 
         for (let index = cube.faces.length - 1; index > -1; -- index) {
 
