@@ -36,6 +36,10 @@
 
         size *= 0.5;
 
+        this.size = size;
+
+        this.cutDirection = 3;
+
         this.vertices = [new Point3D(x - size, y - size, z - size),
                          new Point3D(x + size, y - size, z - size),
                          new Point3D(x + size, y + size, z - size),
@@ -45,11 +49,85 @@
                          new Point3D(x + size, y + size, z + size),
                          new Point3D(x - size, y + size, z + size)];
 
+        this.points = [new Point3D(x + 0.2 * size, y + 0.1 * size, z + -0.1 * size),
+                       new Point3D(x + 0.9 * size, y + 1.4 * size, z + 1.0 * size), 
+                       new Point3D(x + 0.8 * size, y + 1.6 * size, z + 0.8 * size), 
+                       new Point3D(x + 0.9 * size, y + 1.4 * size, z + 0.9 * size),
+                       new Point3D(x + 0.9 * size, y + 1.1 * size, z + 1.7 * size), 
+                       new Point3D(x + 0.9 * size, y + 1.4 * size, z + 1.4 * size),
+                       new Point3D(x + 0.9 * size, y + 1.1 * size, z + 1.8 * size)];
+
+        this.normals = [new Point3D(x + 0.2 * size, y + -0.9 * size, z + -0.4 * size),
+                        new Point3D(x + 0.2 * size, y + -0.8 * size, z + -0.5 * size),
+                        new Point3D(x + 0.2 * size, y + -0.9 * size, z + -0.4 * size),
+                        new Point3D(x + 0.2 * size, y + -0.8 * size, z + -0.6 * size),
+                        new Point3D(x + 0.1 * size, y + -0.9 * size, z + -0.4 * size),
+                        new Point3D(x + 0.2 * size, y + -0.9 * size, z + -0.3 * size),
+                        new Point3D(x + 0.2 * size, y + -0.9 * size, z + -0.4 * size)];
+
+        this.planes = [new Point3D(-100, -71.67777777777778, 300),
+                       new Point3D(100, -71.23333333333333, 300), 
+                       new Point3D(-100, -63.67777777777778, 500),
+                       new Point3D(100, -63.233333333333334, 500)];
+
+
         this.faces = [[0, 1, 2, 3], [0, 4, 5, 1], [1, 5, 6, 2], [3, 2, 6, 7], [0, 3, 7, 4], [4, 7, 6, 5]];
 
       };
 
       Cube.prototype = {
+
+        solvePlanes:function() {
+          let f = this.faces[5]
+          var p_0 = this.vertices[f[3]];
+          var p_1 = this.vertices[f[2]];
+          var t = new Point3D(p_1.x - p_0.x,
+                              p_1.y - p_0.y,
+                              p_1.z - p_0.z);
+          // console.log(t)
+          var n = this.normals[0];
+          var p = this.points[0];
+          var c = -1*((n.x * p.x) + (n.y * p.y) + (n.z * p.z));
+          if (t.x == t.y) {
+            // console.log("solve for Z");
+            var sol_t = (c - 
+                        (n.x * p_0.x) - 
+                        (n.y * p_0.y) - 
+                        (n.z * p_0.z))/(n.z * t.z)
+            // console.log(sol_t);
+            var inter = new Point3D(p_0.x, 
+                                    p_0.y,
+                                    (t.z * sol_t)/this.size + p_0.z);
+            // console.log(inter);
+          }
+          if (t.x == t.z) {
+            // console.log("Solve for Y")
+            var sol_t = (c - 
+                        (n.x * p_0.x) - 
+                        (n.y * p_0.y) - 
+                        (n.z * p_0.z))/(n.y * t.y)
+            // console.log(sol_t);
+            var inter = new Point3D(p_0.x, 
+                                    (t.y * sol_t)/this.size + p_0.y,
+                                    p_0.z);
+            console.log(inter);
+          }
+          if (t.z == t.y) {
+            // console.log("Solve for X");
+            var sol_t = (c - 
+                        (n.x * p_0.x) - 
+                        (n.y * p_0.y) - 
+                        (n.z * p_0.z))/(n.x * t.x)
+            // console.log(sol_t)
+            var inter = new Point3D((t.x * sol_t)/this.size + p_0.x, 
+                                    p_0.y,
+                                    p_0.z);
+            // console.log(inter);
+
+          }
+          // console.log(t)
+
+        },
 
         rotateX:function(radian) {
 
@@ -67,6 +145,31 @@
             p.z = z + this.z;
 
           }
+
+          for (let index = this.points.length - 1; index > -1; -- index) {
+
+            let p = this.points[index];
+
+            let y = (p.y - this.y) * cosine - (p.z - this.z) * sine;
+            let z = (p.y - this.y) * sine + (p.z - this.z) * cosine;
+
+            p.y = y + this.y;
+            p.z = z + this.z;
+
+          }
+
+          for (let index = this.planes.length - 1; index > -1; -- index) {
+
+            let p = this.planes[index];
+
+            let y = (p.y - this.y) * cosine - (p.z - this.z) * sine;
+            let z = (p.y - this.y) * sine + (p.z - this.z) * cosine;
+
+            p.y = y + this.y;
+            p.z = z + this.z;
+
+          }
+
 
         },
 
@@ -86,10 +189,34 @@
             p.z = z + this.z;
 
           }
+          for (let index = this.points.length - 1; index > -1; -- index) {
+
+            let p = this.points[index];
+
+            let x = (p.z - this.z) * sine + (p.x - this.x) * cosine;
+            let z = (p.z - this.z) * cosine - (p.x - this.x) * sine;
+
+            p.x = x + this.x;
+            p.z = z + this.z;
+
+          }
+          for (let index = this.planes.length - 1; index > -1; -- index) {
+
+            let p = this.planes[index];
+
+            let x = (p.z - this.z) * sine + (p.x - this.x) * cosine;
+            let z = (p.z - this.z) * cosine - (p.x - this.x) * sine;
+
+            p.x = x + this.x;
+            p.z = z + this.z;
+
+          }
 
         }
 
       };
+
+
 
       var context = document.querySelector("canvas").getContext("2d");
       var pointer = new Point2D(0, 0);
@@ -105,9 +232,12 @@
         var focal_length = 200;
 
         for (let index = points3d.length - 1; index > -1; -- index) {
-
+          // console.log(index)
           let p = points3d[index];
 
+          // generate (x,y) coordinates
+          // scale by the ratio of the focal length and the z value
+          //   translate to the center of the screen
           let x = p.x * (focal_length / p.z) + width * 0.5;
           let y = p.y * (focal_length / p.z) + height * 0.5;
 
@@ -136,17 +266,54 @@
 
         cube.rotateX(pointer.y * 0.0001);
         cube.rotateY(-pointer.x * 0.0001);
+        cube.solvePlanes();
 
         context.fillStyle = "#000000";
         var symbol_width = 15;
         var vertices = project(cube.vertices, width, height);
+        var projected_points = project(cube.points, width, height);
+        var projected_inter = project(cube.planes, width, height)
 
-        // if dont care
+        // if don't care
+        // context.beginPath();
+        // context.arc(
+        //   width/2, 
+        //   height/2, symbol_width*0.7, 0, 2 * Math.PI);
+        // context.closePath();
+        // context.fill();
+
+        // if coming towards you
         // context.beginPath();
         // context.arc(
         // 	width/2, 
         // 	height/2, symbol_width*0.7, 0, 2 * Math.PI);
-        // context.fill()
+        // context.closePath();
+        // context.stroke();
+        // context.beginPath();
+        // context.arc(
+        //   width/2, 
+        //   height/2, symbol_width*0.2, 0, 2 * Math.PI);
+        // context.closePath();
+        // context.fill();
+
+        // if going away from you
+        // context.beginPath();
+        // context.arc(
+        //   width/2, 
+        //   height/2, symbol_width*0.7, 0, 2 * Math.PI);
+        // context.closePath();
+        // context.stroke();
+        // symbol_width *= 0.866
+        // context.beginPath();
+        // context.moveTo(width/2 - symbol_width, height/2 - symbol_width);
+        // context.lineTo(width/2 + symbol_width, height/2 + symbol_width);
+        // context.closePath();
+        // context.stroke();
+        // context.beginPath();
+        // context.moveTo(width/2 + symbol_width, height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width, height/2 + symbol_width);
+        // context.closePath();
+        // context.stroke();
 
         // if arrow down
         // context.beginPath();
@@ -160,18 +327,100 @@
         // context.closePath();
         // context.fill();
 
-        // if arrow right-down
-        symbol_width *= 0.866
+        // if arrow up
+        // context.beginPath();
+        // context.moveTo(width/2,                  height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width,   height/2);
+        // context.lineTo(width/2 - symbol_width/2, height/2);
+        // context.lineTo(width/2 - symbol_width/2, height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width/2, height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width/2, height/2);
+        // context.lineTo(width/2 + symbol_width,   height/2);
+        // context.closePath();
+        // context.fill();
+
+        // if arrow right
         context.beginPath();
-        context.moveTo(width/2 + symbol_width,       height/2 + symbol_width);
-        context.lineTo(width/2 + symbol_width,       height/2 - symbol_width*(3/4));
-        context.lineTo(width/2 + symbol_width/2,     height/2 - symbol_width*(1/4));
-        context.lineTo(width/2 - symbol_width*(1/4), height/2 - symbol_width);
-        context.lineTo(width/2 - symbol_width,       height/2 - symbol_width*(1/4));
-        context.lineTo(width/2 - symbol_width*(1/4), height/2 + symbol_width/2);
-        context.lineTo(width/2 - symbol_width*(3/4), height/2 + symbol_width);
+        context.moveTo(width/2 + symbol_width,   height/2);
+        context.lineTo(width/2,                  height/2 - symbol_width);
+        context.lineTo(width/2,                  height/2 - symbol_width/2);
+        context.lineTo(width/2 - symbol_width,   height/2 - symbol_width/2);
+        context.lineTo(width/2 - symbol_width,   height/2 + symbol_width/2);
+        context.lineTo(width/2,                  height/2 + symbol_width/2);
+        context.lineTo(width/2,                  height/2 + symbol_width);
         context.closePath();
         context.fill();
+
+        // if arrow left
+        // context.beginPath();
+        // context.moveTo(width/2 - symbol_width,   height/2);
+        // context.lineTo(width/2,                  height/2 + symbol_width);
+        // context.lineTo(width/2,                  height/2 + symbol_width/2);
+        // context.lineTo(width/2 + symbol_width,   height/2 + symbol_width/2);
+        // context.lineTo(width/2 + symbol_width,   height/2 - symbol_width/2);
+        // context.lineTo(width/2,                  height/2 - symbol_width/2);
+        // context.lineTo(width/2,                  height/2 - symbol_width);
+        // context.closePath();
+        // context.fill();
+
+        // if arrow right-down
+        // symbol_width *= 0.866
+        // context.beginPath();
+        // context.moveTo(width/2 + symbol_width,       height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width,       height/2 - symbol_width*(3/4));
+        // context.lineTo(width/2 + symbol_width/2,     height/2 - symbol_width*(1/4));
+        // context.lineTo(width/2 - symbol_width*(1/4), height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width,       height/2 - symbol_width*(1/4));
+        // context.lineTo(width/2 - symbol_width*(1/4), height/2 + symbol_width/2);
+        // context.lineTo(width/2 - symbol_width*(3/4), height/2 + symbol_width);
+        // context.closePath();
+        // context.fill();
+
+        // if arrow left-up
+        // symbol_width *= 0.866
+        // context.beginPath();
+        // context.moveTo(width/2 - symbol_width,       height/2 - symbol_width);
+        // context.lineTo(width/2 - symbol_width,       height/2 + symbol_width*(3/4));
+        // context.lineTo(width/2 - symbol_width/2,     height/2 + symbol_width*(1/4));
+        // context.lineTo(width/2 + symbol_width*(1/4), height/2 + symbol_width);
+        // context.lineTo(width/2 + symbol_width,       height/2 + symbol_width*(1/4));
+        // context.lineTo(width/2 + symbol_width*(1/4), height/2 - symbol_width/2);
+        // context.lineTo(width/2 + symbol_width*(3/4), height/2 - symbol_width);
+        // context.closePath();
+        // context.fill();
+
+        context.fillStyle = "#fc634b";
+        context.beginPath();
+        context.moveTo(projected_inter[0].x, projected_inter[0].y);
+        context.lineTo(projected_inter[1].x, projected_inter[1].y);
+        context.lineTo(projected_inter[3].x, projected_inter[3].y);
+        context.lineTo(projected_inter[2].x, projected_inter[2].y);
+        
+        context.closePath();
+        context.fill();
+        context.fillStyle = "#000000";
+            // context.stroke();
+
+
+        for (let index = projected_inter.length - 1; index > -1; -- index) {
+          context.beginPath();
+          context.arc(
+            projected_inter[index].x, 
+            projected_inter[index].y,
+            3, 0, 2 * Math.PI);
+          context.closePath();
+          context.stroke();
+        }
+
+        for (let index = cube.points.length - 1; index > -1; -- index) {
+          context.beginPath();
+          context.arc(
+            projected_points[index].x, 
+            projected_points[index].y,
+            3, 0, 2 * Math.PI);
+          context.closePath();
+          context.fill();
+        }
 
         for (let index = cube.faces.length - 1; index > -1; -- index) {
 
@@ -180,6 +429,8 @@
           let p1 = cube.vertices[face[0]];
           let p2 = cube.vertices[face[1]];
           let p3 = cube.vertices[face[2]];
+
+          // console.log(vertices[face[0]])
 
           let v1 = new Point3D(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
           let v2 = new Point3D(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z);
